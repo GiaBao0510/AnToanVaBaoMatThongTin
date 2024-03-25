@@ -70,11 +70,10 @@ def HaiSoNguyenToNgauNhien(ds):
 listSoNguyenTo = [] #Danh sách số nguyên tố
 
 #Lưu các sô nguyên tố và danh sách
-file = open('ThucHanh3/DanhSachSoNguyenTo.txt','r')
+file = open('DanhSachSoNguyenTo.txt','r')
 DauVao = file.readline()        #Chuỗi đầu vào
 DauVao = DauVao.split()         #Phân tách chuỗi thành danh sách dựa trên khoảng cách
 DauVao = list(map(int, DauVao)) #Thay đổi tất cả các phần tử trong danh sách sang kiểu số nguyên
-
 
 #Sinh khóa
 def SinhKhoa():
@@ -105,24 +104,27 @@ def PublicKey(D, C ,N):
     P = (C**D )% N
     return P
 
-#Mã hóa
+#>>>Mã hóa
 def MaHoa(text , E, N):
-    VanBanMaHoa = ''
+    VanBanMaHoa = str()
     for i in text:
-        soThapPhan = ord(i)   #Chuyen cac ky tu ve dang thap phân
-        VanBanMaHoa += str(PublicKey(E, soThapPhan, N)) + ' '
+        soThapPhan = ord(i)                                 #Chuyen cac ky tu ve dang thap phân
+        soThapLucPhan = hex( PublicKey(E, soThapPhan, N))   #Chuyển các lý tự từ hệ thập phân sang thập lục phân
+        VanBanMaHoa += soThapLucPhan
     return VanBanMaHoa
 
-#Giải mã
+#>>>Giải mã
 def GiaiMa(cipherText , D, N):
-    tach = cipherText.strip().split(' ')        #tách để tạo ra danh sách dựa trên khoảng cách
-    tach = list(map(int, tach))         #Chuyển các phần tử bên trong về dạng số nguyên
+    tach = cipherText.split('0x')        #tách để tạo ra danh sách dựa trên "0x"
+    tach = tach[1:]                      #Loại bỏ phần tử đầu. Vì nó là khoảng trống
+    tach = [ int(x,16) for x in tach]    #Chuyển tất cả các phần tử bên trong danh sách từ hệ thập lục phân sang hệ thập phân
+
+    #Chuyển các phần tử bên trong về dạng số nguyên
     ghinhan = ''
     for i in range(len(tach)):
         ghinhan +=  str( chr(PrivateKey(D, tach[i], N)))
         
     return ghinhan
-
 
 #------ Chạy ---------
 plaitText = "SECRET OK"        #Bản gõ
@@ -132,4 +134,4 @@ print("E: ",E," - D: ",D," - N: ",N)
 
 mh =  MaHoa(plaitText , E, N)
 print(" - Van Ban Ma Hoa: ",mh)
-print('Giải mã: ',GiaiMa(mh , D, N))
+print(' - Giải mã: ',GiaiMa(mh , D, N))
